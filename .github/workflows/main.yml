@@ -24,7 +24,9 @@ jobs:
         dotnet new classlib -n TempProject
         cd TempProject
         del Class1.cs
-        echo "<ItemGroup><Compile Include=\"../file.csx\" /></ItemGroup>" >> TempProject.csproj
+
+        powershell -Command ^
+          "(Get-Content TempProject.csproj) -replace '</Project>', '  <ItemGroup><Compile Include=""../file.csx"" /></ItemGroup></Project>' | Set-Content TempProject.csproj"
 
     - name: Build DLL
       run: dotnet build TempProject/TempProject.csproj --configuration Release

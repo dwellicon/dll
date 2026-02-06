@@ -1,38 +1,28 @@
-name: Build CSX to DLL
+name: Build DLL
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main, master, develop ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main, master, develop ]
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
+    - uses: actions/checkout@v3
+    
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: "8.0.x"
-
-    - name: Create temporary project
-      run: |
-        dotnet new classlib -n TempProject
-        cd TempProject
-        del Class1.cs
-
-        powershell -Command ^
-          "(Get-Content TempProject.csproj) -replace '</Project>', '  <ItemGroup><Compile Include=""../file.csx"" /></ItemGroup></Project>' | Set-Content TempProject.csproj"
-
-    - name: Build DLL
-      run: dotnet build TempProject/TempProject.csproj --configuration Release
-
-    - name: Upload DLL
-      uses: actions/upload-artifact@v4
+        dotnet-version: '6.0.x'
+    
+    - name: Build DLL from .csx
+      run: csc file.csx -target:library -out:RedTeamPayload.dll
+    
+    - name: Upload DLL artifact
+      uses: actions/upload-artifact@v3
       with:
-        name: csx-dll
-        path: TempProject/bin/Release/**/*.dll
+        name: RedTeamPayload-dll
+        path: RedTeamPayload.dll

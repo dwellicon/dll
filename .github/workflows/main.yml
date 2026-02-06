@@ -1,4 +1,4 @@
-name: Build DLL
+name: Build CSX to DLL
 
 on:
   push:
@@ -19,15 +19,18 @@ jobs:
       with:
         dotnet-version: "8.0.x"
 
-    - name: Restore dependencies
-      run: dotnet restore
+    - name: Create temporary project
+      run: |
+        dotnet new classlib -n TempProject
+        cd TempProject
+        del Class1.cs
+        echo "<ItemGroup><Compile Include=\"../file.csx\" /></ItemGroup>" >> TempProject.csproj
 
-    - name: Build as DLL
-      run: dotnet build --configuration Release
+    - name: Build DLL
+      run: dotnet build TempProject/TempProject.csproj --configuration Release
 
-    - name: Publish DLL artifact
+    - name: Upload DLL
       uses: actions/upload-artifact@v4
       with:
-        name: compiled-dll
-        path: |
-          **/bin/Release/**/*.dll
+        name: csx-dll
+        path: TempProject/bin/Release/**/*.dll

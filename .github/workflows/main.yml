@@ -19,7 +19,7 @@ jobs:
         dotnet-version: '6.0.x'
     
     - name: Build DLL from .csx
-      run: csc file.csx -target:library -out:RedTeamPayload.dll
+      run: dotnet csc file.csx -target:library -out:RedTeamPayload.dll
     
     - name: Upload DLL artifact
       uses: actions/upload-artifact@v4
